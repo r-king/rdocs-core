@@ -1,0 +1,16 @@
+﻿@model Rdocs.Models.DocumentaryBaseResponse
+
+<div>
+    @foreach (var item in Model.Data.Children)
+    {
+
+        if (item.Data.Secure_Media == null) { continue; }
+
+        try
+        {
+            @await Html.PartialAsync("_VideoItem", item)
+        }
+        catch (Exception) { }
+    }
+
+</div>

@@ -1,0 +1,58 @@
+﻿@model Rdocs.Models.DocumentaryBaseResponse
+
+@{
+    ViewData["Title"] = "Search";
+}
+
+<h3>Search results for @ViewData["SearchString"]</h3>
+
+<div id="hotDocumentaries">
+    @await Html.PartialAsync("_VideoList", Model)
+</div>
+
+
+@await Html.PartialAsync("_Loader")
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+    var isLoading = false;
+    var after = '@Model.Data.After'
+
+    $(window).scroll(function () {
+        if ($(window).scrollTop() == $(document).height() - $(window).height() && isLoading == false) {
+            isLoading = true;
+            $("#loader").show();
+                $.ajax({
+                    url: '@Url.Action("SearchNext", "Home")',
+                    data: { after : after, searchString : '@ViewData["SearchString"]'},
+                    success: function (response) {
+                        $("#loader").hide();
+                        after = response.after;
+                        $("#hotDocumentaries").append(response.view.result);
+                        isLoading = false;
+                    },
+                    error: function () {
+                        isLoading = false;
+                        $("#loader").hide();
+                    }
+                });
+            }
+    });
+
+     function playVideo(id, url) {
+
+                $.ajax({
+                    url: '@Url.Action("GetYoutubeIframe", "Home")',
+                    data: { url : url},
+                    success: function (response) {
+                        $("#" + id).html(response.value);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+    </script>
+}

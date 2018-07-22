@@ -1,0 +1,55 @@
+﻿@model Rdocs.Models.DocumentaryBaseResponse
+
+@{
+    ViewData["Title"] = "Hot";
+}
+
+<div id="hotDocumentaries" class="videoInline">
+    @await Html.PartialAsync("_VideoList", Model)
+</div>
+
+@await Html.PartialAsync("_Loader")
+
+@section Scripts {
+
+<script type="text/javascript">
+
+    var isLoading = false;
+    var after = '@Model.Data.After'
+
+    $(window).scroll(function () {
+        if ($(window).scrollTop() == $(document).height() - $(window).height() && isLoading == false) {
+            isLoading = true;
+            $("#loader").show();
+                $.ajax({
+                    url: '@Url.Action("HotNext", "Home")',
+                    data: { after : after},
+                    success: function (response) {
+                        $("#loader").hide();
+                        after = response.after;
+                        $("#hotDocumentaries").append(response.view.result);
+                        isLoading = false;
+                    },
+                    error: function () {
+                        isLoading = false;
+                        $("#loader").hide();
+                    }
+                });
+            }
+    });
+
+     function playVideo(id, url) {
+
+                $.ajax({
+                    url: '@Url.Action("GetYoutubeIframe", "Home")',
+                    data: { url : url},
+                    success: function (response) {
+                        $("#" + id).html(response.value);
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+</script>
+}
